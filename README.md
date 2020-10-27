@@ -12,6 +12,8 @@ The folder ['basic simulations'](basic%20simulations) contains the files necessa
 
 The folder ['pooled testing'](pooled%20testing) contains the files necessary for reproducing the simulations of pooled testing for elementary schools. Run the file ['generate_pooled.m'](pooled%20testing/generate_pooled.m).
 
+The folder ['outbreak plots'](outbreak%20plots) contains the files necessary for generating the plots of clusters under different protocols, one of which is shown in the paper. Run the file ['make_outbreaks.m'](outbreak%20plots/make_outbreaks.m).
+
 
 
 
