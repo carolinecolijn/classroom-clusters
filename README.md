@@ -13,8 +13,7 @@ The folder ['pooled testing'](pooled%20testing) contains the files necessary for
 
 The folder ['outbreak plots'](outbreak%20plots) contains the files necessary for generating the plots of clusters under different protocols, one of which is shown in the paper. Run the file ['make_outbreaks.m'](outbreak%20plots/make_outbreaks.m).
 
-
-
+The folder ['model-output'](model-output) contains the output files for various simulations in the paper, along with tables of results. Run (model-output/figure-script-clean.R) to generate the figures in the paper using this data. 
 
 
 
