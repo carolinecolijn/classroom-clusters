@@ -1,0 +1,107 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 ArialMT;\f1\fswiss\fcharset0 Arial-ItalicMT;\f2\fswiss\fcharset0 Arial-BoldMT;
+\f3\fnil\fcharset0 HelveticaNeue-Medium;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red27\green31\blue34;\red255\green255\blue255;
+\red109\green109\blue109;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c14118\c16078\c18039;\cssrgb\c100000\c100000\c100000;
+\cssrgb\c50196\c50196\c50196;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs30 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \
+How to interpret results in 
+\f1\i elem_table.csv, high_table.csv, pool_table.csv
+\f0\i0 \
+\
+First, for 
+\f1\i elem_table.csv, high_table.csv, 
+\f0\i0 we have\'85\
+\
+
+\f2\b World
+\f0\b0  - we simulated 5 different \'93worlds\'94 with different assumptions about aerosol transmission f_aero, infectiousness of asymptomatic f_asymp , and the duration of the presymptomatic infectious period mu_pip\
+      f_aero           f_ asymp      mu_pip\
+a -    0.05            0.2                  1\
+b -    0.05            0.2                  2\
+c -    0.05            0.8                  2\
+d -    0.25            0.8                  2\
+e -    0.5              0.8                  2\
+\
+
+\f2\b Interv 
+\f0\b0 and 
+\f2\b Prot\
+
+\f0\b0 Different labels for the same thing. We consider four different protocols. Interv is a name and Prot is a roman numerical. See the text of the paper.\
+\
+
+\f2\b index_asymp - 
+\f0\b0 Whether or not the index case is asymptomatic.\
+\
+
+\f2\b percent_over_5 
+\f0\b0 - what fraction of simulations with these parameters have cluster size greater than 5. (Where 
+\f2\b cluster size
+\f0\b0  is the total number of infected students, including the index case.)\
+\
+
+\f2\b mean_clustersize - 
+\f0\b0 mean\
+\
+
+\f2\b q25_clustersize 
+\f0\b0 - 1st quartile\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b \cf2 \outl0\strokewidth0 q50_clustersize 
+\f0\b0 - median\
+\
+
+\f2\b q75_clustersize 
+\f0\b0 - 3rd quartile\
+\
+
+\f2\b mean_affected, median_affected 
+\f0\b0 - 
+\f2\b affected 
+\f0\b0 is the same thing as \'93disrupted\'94 in the paper. Either develops symptoms and asked to stay home or in a group that is shut down or a class that is shutdown.\
+\
+
+\f2\b days_lax, days_strict - 
+\f0\b0 These are the number of days asymptomatic but infectious students are unidentified. 
+\f2\b Lax
+\f0\b0  means that asymptomatic students are never identified, so it is just a count of total asymptomatic infectious student days. 
+\f2\b Strict 
+\f0\b0 means that when a group or class is \'93shutdown\'94 (instructed to self-isolate) students in that group or class are no longer counted.\
+\pard\pardeftab720\partightenfactor0
+\cf2 \outl0\strokewidth0 \
+For 
+\f1\i pool_table.csv 
+\f0\i0 we have\'85(some terms are the same)\
+\
+
+\f2\b testfreq 
+\f0\b0 - how often pooled testing is done.\
+\
+
+\f2\b onsite 
+\f0\b0 - whether testing is done onsite\
+\
+
+\f2\b num_morethan_5
+\f0\b0  - number of simulations out of a thousand with cluster size more than 5\
+\
+
+\f2\b perc_above_5 
+\f0\b0 - percent of simulations with cluster size more than 5\
+\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trcbpat4 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth1714\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt100 \clpadl100 \clpadb100 \clpadr100 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl240\partightenfactor0
+
+\f3\b\fs24 \cf3 \strokec3 \cell \lastrow\row
+}
