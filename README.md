@@ -8,7 +8,7 @@ several different protocols: [COVID-19's unfortunate events in schools: mitigati
 
 The model is written in Matlab, with outbreak visualization in Matlab and other plots for the manuscript in R. 
 
-The folder ['basic simulations'](basic simulations) contains the files necessary for reproducing most of the simulations in the preprint. Simulations for the elementary schools and highschools with structures currently in place in BC are obtained by running ['generate_spreadsheet.m'](basic simulations/generate_spreadsheet.m')
+The folder ['basic%20simulations'](basic simulations) contains the files necessary for reproducing most of the simulations in the preprint. Simulations for the elementary schools and highschools with structures currently in place in BC are obtained by running ['generate_spreadsheet.m'](basic simulations/generate_spreadsheet.m')
 
 
 
