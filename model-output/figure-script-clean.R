@@ -43,8 +43,7 @@ elem$nathist= factor(elem$nathist, levels = c("1-day mean PIP,  low asymp. trans
 
  
 # ----   
-# ---- Figure 3 which is "world d" showing total infected, split by panel and index symptoms ----- # 
- 
+# ----  
 
  ggplot(data=filter(elem, world=="d"), aes(x= total_infected, y=interv, fill=index_asymp,
                                           color=index_asymp))+
@@ -488,13 +487,20 @@ ggsave("high-force-infection-revised.pdf", width=6, height=8)
 
 
 elempool = readr::read_csv("elementary_pooled.csv") %>% 
-  mutate(index_asymp = ifelse(index_asymp==0, "No", "Yes"))  %>% mutate(freq= factor(freq)) %>% 
-  mutate(onsite = factor(onsite))
+  mutate(index_asymp = ifelse(index_asymp==0, "Index symptomatic", "Index asymptomatic")) %>% 
+  # mutate(index_asymp = ifelse(index_asymp==0, "No", "Yes"))  %>% 
+  mutate(freq= factor(freq)) %>% 
+  mutate(freqdesc = case_when(freq ==1 ~ "No random testing",
+                              freq == 2 ~ "Weekly",
+                              freq==3 ~ "Every three days",
+                              TRUE ~ "hi")) %>% 
+  mutate(freqdesc = factor(freqdesc, levels = c("No random testing","Weekly","Every three days"))) %>% 
+  mutate(`Tests performed on site` = ifelse(onsite==0, "No","Yes"))
  
 
 
-ggplot(data=elempool, aes(x= total_infected, y=freq, fill=onsite,
-                                          color=onsite))+
+ggplot(data=elempool, aes(x= total_infected, y=freqdesc, fill=`Tests performed on site`,
+                                          color=`Tests performed on site`))+
   stat_binline(breaks=0:26, scale = 1, 
                draw_baseline = FALSE, 
                alpha=0.5, color= "grey44", closed = "left") +
@@ -504,10 +510,10 @@ ggplot(data=elempool, aes(x= total_infected, y=freq, fill=onsite,
   theme(strip.text = element_text(face="bold", size=8,color="black"),
         strip.background = element_rect(fill="grey65",colour="white",size=0.7),
         strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
-        axis.title.y = element_blank(), legend.position = "bottom")  +
-  xlab("Total cluster size") + guides(fill=guide_legend(title="onsite"), color=FALSE)
+       legend.position = "bottom")  +
+  xlab("Total cluster size")+ylab("Count") + guides( color=FALSE)
 
-ggsave("pooled-testing-tmp.pdf", width = 8, height = 6)
+ggsave("pooled-testing-revised.pdf", width = 8, height = 6)
 
 
 
