@@ -16,7 +16,7 @@ mycols <-  c("#AF8DC3", "#D3D3D3","#7FBF7B")
 
 # --- load Paul's simulations 
 
-elem = readr::read_csv("elementary.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "No", "Yes")) %>% 
+elem = readr::read_csv("elementary.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "Index symptomatic", "Index asymptomatic")) %>% 
    mutate(interv =  ifelse(protocol == "I", "Baseline",
                                    ifelse(protocol == "II", "Contact" ,  
                                           ifelse(protocol == "III", "Two groups\nis an outbreak" ,  
@@ -57,10 +57,10 @@ elem$nathist= factor(elem$nathist, levels = c("1-day mean PIP,  low asymp. trans
   theme(strip.text = element_text(face="bold", size=8,color="black"),
         strip.background = element_rect(fill="grey65",colour="white",size=0.7),
         strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
-        axis.title.y = element_blank(), legend.position = "bottom")  +
-  xlab("Total cluster size") + guides(fill=guide_legend(title="Index asymptomatic"), color=FALSE)
+         legend.position = "bottom")  +ylab("Count")+
+  xlab("Total cluster size") + guides(fill=FALSE,color=FALSE)  # guides(fill=guide_legend(title="Index asymptomatic"), color=FALSE)
 
- 
+ ggsave("figure3-revised.pdf", width = 6, height=8)
  
 # boxplot version 
  ggplot(data=filter(elem, world=="d"), aes(x=interv, y=total_infected,fill=index_asymp)) +
@@ -159,11 +159,11 @@ plotlist = lapply(1:5, function(x) {
     theme(strip.text = element_text(face="bold", size=8,color="black"),
           strip.background = element_rect(fill="grey65",colour="white",size=0.7),
           strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
-          axis.title.y = element_blank(), legend.position = "bottom") + ggtitle(mytitles[x])   +
-    xlab("Total disrupted") + guides(fill=guide_legend(title="Index asymptomatic"), color=FALSE) })
+           legend.position = "bottom") + ggtitle(mytitles[x])   +
+    xlab("Total disrupted") +ylab("Count")+ guides(fill=FALSE,color=FALSE) })# guides(fill=guide_legend(title="Index asymptomatic"), color=FALSE) })
 
 plotlist[[4]]
-# ggsave(plotlist[[4]], file = "elem-tot-disrupted-d.pdf", width = 6, height = 8)
+ ggsave(plotlist[[4]], file = "elem-tot-disrupted-d-revised.pdf", width = 6, height = 8)
 
 
 ############################################################
@@ -187,6 +187,7 @@ ggplot(data=filter(filter(elem_long, days_exp >=0), world=="d"), aes(y= days_exp
         axis.title.x = element_blank(), legend.position = "bottom")  +
   scale_fill_discrete(name="Lax or strict", labels = c("Lax", "Strict"))+ guides( color=FALSE) 
 
+ggsave("figure5-revised.pdf", width=6, height=8)
 
 
 
@@ -197,7 +198,7 @@ ggplot(data=filter(filter(elem_long, days_exp >=0), world=="d"), aes(y= days_exp
 ###############3###############3###############3###############3###############3
 
 # ---- read data ---- 
-highmorn = readr::read_csv("highschool_morning.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "No", "Yes")) %>% 
+highmorn = readr::read_csv("highschool_morning.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "Index symptomatic", "Index asymptomatic")) %>% 
   mutate(interv =  ifelse(protocol == "I", "Baseline",
                           ifelse(protocol == "II", "Contact\n" ,  
                                  ifelse(protocol == "III", "Two groups\nis an outbreak" ,  
@@ -212,7 +213,7 @@ highmorn = readr::read_csv("highschool_morning.csv") %>% mutate(index_asymp = if
                                                 "Index high, class medium")))
 
   
-  highaft = readr::read_csv("highschool_afternoon.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "No", "Yes")) %>% 
+  highaft = readr::read_csv("highschool_afternoon.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "Index symptomatic", "Index asymptomatic")) %>% 
     mutate(interv =  ifelse(protocol == "I", "Baseline",
                             ifelse(protocol == "II", "Contact\n" ,  
                                    ifelse(protocol == "III", "Two groups\nis an outbreak" ,  
@@ -226,7 +227,7 @@ highmorn = readr::read_csv("highschool_morning.csv") %>% mutate(index_asymp = if
                                                   "Index and class medium",
                                                   "Index high, class medium")))
   
-highnorm = readr::read_csv("highschool_normal.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "No", "Yes")) %>% 
+highnorm = readr::read_csv("highschool_normal.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "Index symptomatic", "Index asymptomatic")) %>% 
   mutate(interv =  ifelse(protocol == "I", "Baseline",
                           ifelse(protocol == "II", "Contact\n" ,  
                                  ifelse(protocol == "III", "Two groups\nis an outbreak" ,  
@@ -318,7 +319,7 @@ plotlist_normal = lapply(1:5, function(x) {
           strip.background = element_rect(fill="grey65",colour="white",size=0.7),
           strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
           axis.title.y = element_blank(), legend.position = "bottom") + ggtitle(mytitles[x])   +
-    xlab("Total cluster size") + guides(fill=guide_legend(title="Index asymptomatic"), color=FALSE) })
+    xlab("Total cluster size") +ylab("Count")+ guides(fill=FALSE, color=FALSE) })
 
 plotlist_bc = lapply(1:5, function(x) {
   ggplot(data=filter(highboth, world==worlds[x]), aes(x= total_infected, y=interv, fill=index_asymp,
@@ -332,9 +333,10 @@ plotlist_bc = lapply(1:5, function(x) {
     theme(strip.text = element_text(face="bold", size=8,color="black"),
           strip.background = element_rect(fill="grey65",colour="white",size=0.7),
           strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
-          axis.title.y = element_blank(), legend.position = "bottom") + ggtitle(mytitles[x])   +
-    xlab("Total cluster size") + guides(fill=guide_legend(title="Index asymptomatic"), color=FALSE) })
-
+           legend.position = "bottom") + ggtitle(mytitles[x])   +
+    xlab("Total cluster size")+ylab("Count") + guides(fill=FALSE, color=FALSE) })
+plotlist_normal[[4]]
+plotlist_bc[[4]]
 # ggsave(plotlist_normal[[4]], file = "highnormal-test.pdf")
 # ggsave(plotlist_bc[[4]], file = "highbc-test.pdf")
 # it is hard to see the difference in this format. They need to cbe compared side by side. 
@@ -393,24 +395,40 @@ ggplot(data=filter(highboth, world=="d"), aes(x= total_not_detected, y=interv, f
         strip.background = element_rect(fill="grey65",colour="white",size=0.7),
         strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
         axis.title.y = element_blank(), legend.position = "bottom")  +
-  xlab("Cluster size") + guides(fill=guide_legend(title="Index asymptomatic"), color=FALSE)
+  xlab("Cluster size") + guides(fill=FALSE, color=FALSE)
 
-
-
-ggplot(data=filter(highboth, world=="d"), aes(x= students_disrupted, y=interv))+
+# new - recreate Figure A2 in the paper 
+ggplot(data=filter(highall, world=="d" & Setting == "Modified"), aes(x= total_not_detected, y=interv, fill=index_asymp,
+                                              color=index_asymp))+
   stat_binline(breaks=0:46, scale = 0.9, 
                draw_baseline = FALSE, 
                alpha=0.5, color= "grey44",closed = "left") +
-  facet_wrap( ~ panelname, nrow = 4 )   + theme_light() +
-  # scale_fill_manual(values = mycols[c(3,1)]) + 
-  #  scale_color_manual(values = mycols[c(3,1)]) + 
+  facet_grid( panelnew ~ index_asymp )   + theme_light() +
+  scale_fill_manual(values = mycols[c(3,1)]) + 
+  scale_color_manual(values = mycols[c(3,1)]) + 
   theme(strip.text = element_text(face="bold", size=8,color="black"),
         strip.background = element_rect(fill="grey65",colour="white",size=0.7),
         strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
-        axis.title.y = element_blank(), legend.position = "bottom")  +
-  xlab("Students disrupted") 
+        legend.position = "bottom")  +
+  xlab("Cluster size") +ylab("Count")+ guides(fill=FALSE, color=FALSE)
+ggsave("high-world-d-revised.pdf",width=6,height = 8)
 
 
+# and here is Figure A3 in the paper 
+ggplot(data=filter(highall, world=="d", Setting =="Modified"), aes(x= students_disrupted, y=interv, fill=index_asymp,
+                                                                   color=index_asymp))+
+  stat_binline(breaks=0:46, scale = 0.9, 
+               draw_baseline = FALSE, 
+               alpha=0.5, color= "grey44",closed = "left") +
+  facet_grid( panelnew ~ index_asymp )   + theme_light() +
+   scale_fill_manual(values = mycols[c(3,1)]) + 
+    scale_color_manual(values = mycols[c(3,1)]) + 
+  theme(strip.text = element_text(face="bold", size=8,color="black"),
+        strip.background = element_rect(fill="grey65",colour="white",size=0.7),
+        strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
+         legend.position = "bottom")  +
+  xlab("Students disrupted") +ylab("Count")+ guides(fill=FALSE, color=FALSE)
+ggsave("high-tot-disrupted-d-revised.pdf", width = 6, height = 8)
 
 ##################################################
 
@@ -427,6 +445,41 @@ high_table = highboth %>%
 nSims=max(highaft$simulation_number)
 high_table$perc_above_5 = high_table$num_morethan_5*(100/nSims)
 print(filter(high_table, world=="d"), n=32)
+
+
+
+high_long  = gather(highall, laxorstrict, days_exp, days_asymp_lax, days_asymp_strict)
+high_long$laxorstrict = factor(high_long$laxorstrict)
+
+ggplot(data=filter(filter(high_long, days_exp >=0), world=="d", Setting=="Modified"), aes(y= days_exp, x=interv, fill=laxorstrict,
+                                                                     color=laxorstrict))+
+  geom_violin(width = 0.9, alpha=0.5,position = position_dodge(width = 0.5)) + #  geom_jitter(alpha=0.2, width = 0.1, size = 0.3)+
+  facet_grid( panelnew ~ index_asymp )   + theme_light() +
+  #  scale_fill_manual(values = mycols[c(3,1)]) + 
+  #  scale_color_manual(values = mycols[c(3,1)]) + 
+  theme(strip.text = element_text(face="bold", size=8,color="black"),
+        strip.background = element_rect(fill="grey65",colour="white",size=0.7),
+        strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
+        axis.title.x = element_blank(), legend.position = "bottom")  +
+  scale_fill_discrete(name="Lax or strict", labels = c("Lax", "Strict"))+
+  ylab("Student-days")+guides( color=FALSE) 
+
+ggsave("high-force-infection-revised.pdf", width=6, height=8)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ###############################################################
