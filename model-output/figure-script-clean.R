@@ -19,7 +19,7 @@ mycols <-  c("#AF8DC3", "#D3D3D3","#7FBF7B")
 elem = readr::read_csv("elementary.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "Index symptomatic", "Index asymptomatic")) %>% 
    mutate(interv =  ifelse(protocol == "I", "Baseline",
                                    ifelse(protocol == "II", "Contact" ,  
-                                          ifelse(protocol == "III", "Two groups\nis an outbreak" ,  
+                                          ifelse(protocol == "III", "Two groups" ,  
                                                  ifelse(protocol == "IV", "Whole class",NA ))))) %>% 
   mutate( panelnew = ifelse(panelname =="env beta low, index same", "Index and class low",
                             ifelse(panelname ==  "env beta low, index higher", "Index medium, class low",
@@ -29,28 +29,28 @@ elem = readr::read_csv("elementary.csv") %>% mutate(index_asymp = ifelse(index_a
                                                 "Index medium, class low",
                                                 "Index and class medium",
                                                 "Index high, class medium"))) %>% 
-  mutate(nathist  =  ifelse(world =="a", "1-day mean PIP,  low asymp. transn, low mixing/aerosol",
-                                 ifelse(world =="b", "2-day PIP, low asymp. transn, low mixing/aerosol" ,  
-                       ifelse(world =="c","2-day PIP, higher asymp. transn, low mixing/aerosol",  
-                              ifelse(world =="d","2-day PIP, higher asymp. transn, medium mixing/aerosol",
-                 ifelse(world =="e","2-day PIP, higher asymp. transn, higher mixing/aerosol", NA))))))
-elem$nathist= factor(elem$nathist, levels = c("1-day mean PIP,  low asymp. transn, low mixing/aerosol",
-                                              "2-day PIP, low asymp. transn, low mixing/aerosol" ,
-                                              "2-day PIP, higher asymp. transn, low mixing/aerosol",
-                                              "2-day PIP, higher asymp. transn, medium mixing/aerosol",
-                                              "2-day PIP, higher asymp. transn, higher mixing/aerosol"))
+  mutate(nathist  =  ifelse(world =="a", "1-day mean PIP,  low asymp. transn,\nlow mixing/aerosol",
+                                 ifelse(world =="b", "2-day PIP, low asymp. transn, \nlow mixing/aerosol" ,  
+                       ifelse(world =="c","2-day PIP, higher asymp. transn, \nlow mixing/aerosol",  
+                              ifelse(world =="d","2-day PIP, higher asymp. transn,\n medium mixing/aerosol",
+                 ifelse(world =="e","2-day PIP, higher asymp. transn,\n higher mixing/aerosol", NA))))))
+elem$nathist= factor(elem$nathist, levels = c("1-day mean PIP,  low asymp. transn,\nlow mixing/aerosol",
+                                              "2-day PIP, low asymp. transn, \nlow mixing/aerosol" ,
+                                              "2-day PIP, higher asymp. transn, \nlow mixing/aerosol",
+                                              "2-day PIP, higher asymp. transn,\n medium mixing/aerosol",
+                                              "2-day PIP, higher asymp. transn,\n higher mixing/aerosol"))
 
 
  
 # ----   
 # ----  
 
- ggplot(data=filter(elem, world=="d"), aes(x= total_infected, y=interv, fill=index_asymp,
+p= ggplot(data=filter(elem, world=="d"), aes(x= total_infected, y=interv, fill=index_asymp,
                                           color=index_asymp))+
   stat_binline(breaks=0:26, scale = 1, 
                draw_baseline = FALSE, 
                alpha=0.5, color= "grey44", closed = "left") +
-  facet_grid( panelnew ~ index_asymp )   + theme_light() +
+   facet_grid( panelnew ~ index_asymp )   + theme_light() +
   scale_fill_manual(values = mycols[c(3,1)]) + 
           scale_color_manual(values = mycols[c(3,1)]) + 
   theme(strip.text = element_text(face="bold", size=8,color="black"),
@@ -59,7 +59,29 @@ elem$nathist= factor(elem$nathist, levels = c("1-day mean PIP,  low asymp. trans
          legend.position = "bottom")  +ylab("Count")+
   xlab("Total cluster size") + guides(fill=FALSE,color=FALSE)  # guides(fill=guide_legend(title="Index asymptomatic"), color=FALSE)
 
- ggsave("figure3-revised.pdf", width = 6, height=8)
+#  ggsave("figure3-revised.pdf", width = 6, height=8)
+ 
+
+ 
+getpanel = function(x) {
+  return(ggplot(data =filter(elem, world=="d" ,panel==x), 
+       aes(x = total_infected, fill=index_asymp)) +
+         scale_fill_manual(values = mycols[c(3,1)]) + 
+  geom_histogram(position="dodge",breaks=0:20,alpha=0.8)  + # coord_flip() + 
+  facet_grid(interv~ index_asymp) + guides(fill=FALSE) +  theme_light()+
+    ggtitle(elem$panelnew[min(which(elem$panel==x))])) # +
+  # theme(strip.text = element_text(size = 8)))
+   }
+plist = lapply(1:4, getpanel)
+ ggarrange(plist[[1]]+theme(axis.title.x = element_blank(),
+                            strip.text.y = element_blank()),
+           plist[[2]]+theme(axis.title.x = element_blank())+
+             theme(axis.title.y = element_blank())  ,
+           plist[[3]]+xlab("Total cluster size") +
+             theme(strip.text.y = element_blank()), 
+           plist[[4]]+theme(axis.title.y= element_blank())+xlab("Total cluster size"),
+           nrow = 2, ncol=2)
+ ggsave("figure3-revised-again.pdf", width = 6, height=8)
  
 # boxplot version 
  ggplot(data=filter(elem, world=="d"), aes(x=interv, y=total_infected,fill=index_asymp)) +
@@ -94,7 +116,49 @@ ggplot(data=filter(elem, panel == 4 ), aes(x= total_infected, y=interv))+
 
 # ggsave(file = "supp-fig-compare-worlds.pdf", width = 5, height = 8)
 
+ gethistpanel = function(thisw) {
+   return(ggplot(data =filter(elem,  panel==4,world==thisw ), 
+                 aes(x = total_infected)) +
+            scale_fill_manual(values = mycols[c(3,1)]) + 
+            geom_histogram(position="dodge",breaks=0:25,alpha=0.7, fill="blue")  + # coord_flip() + 
+            facet_wrap( ~ interv, ncol=1, strip.position = "right") + guides(fill=FALSE) + 
+            xlab("Total cluster size") + theme_light()+
+            ggtitle(elem$nathist[min(which(elem$world==thisw))]) +
+            theme(plot.title = element_text(size=10))
+          ) # +
+   # theme(strip.text = element_text(size = 8)))
+ }
 
+plist = lapply(c("a","b","c","d","e"), gethistpanel)
+ggarrange(plist[[1]] + theme(strip.text.y = element_blank()), 
+          plist[[2]] + theme(axis.title.y = element_blank(),
+                             strip.text.y = element_blank() ),
+          plist[[3]] + theme(axis.title.y = element_blank(),
+                             strip.text.y = element_blank()),
+          plist[[4]] + theme(axis.title.y = element_blank(),
+                             strip.text.y = element_blank()),
+          plist[[5]] + theme(axis.title.y = element_blank()), nrow=1)
+ggsave(file = "supp-fig-compare-worlds-rev-again.pdf", width = 15, height = 8)
+
+# make 2 separate ones so the fonts can look bigger 
+
+# part 1: 
+ggarrange(plist[[1]] + theme(strip.text.y = element_blank()) + xlim(c(0,17))+
+            theme(plot.title = element_text(size=12)), 
+          plist[[2]] + theme(axis.title.y = element_blank(),
+                             strip.text.y = element_blank() ) + xlim(c(0,17))+
+            theme(plot.title = element_text(size=12)),
+          plist[[3]] + theme(axis.title.y = element_blank()) + xlim(c(0,17))+
+            theme(plot.title = element_text(size=12)), nrow=1)
+ggsave(file = "supp-fig-compare-worlds-rev-again-p1.pdf", width = 10, height = 10)
+
+# part 2 
+ggarrange(  plist[[4]] + theme(axis.title.y = element_blank(),
+           strip.text.y = element_blank())+
+             theme(plot.title = element_text(size=12)),
+        plist[[5]] + theme(axis.title.y = element_blank())+
+          theme(plot.title = element_text(size=12)), nrow=1)
+ggsave(file = "supp-fig-compare-worlds-rev-again-p2.pdf", width = 6.5, height = 10)
 
 
 ################################################################################
@@ -164,6 +228,31 @@ plotlist = lapply(1:5, function(x) {
 plotlist[[4]]
  ggsave(plotlist[[4]], file = "elem-tot-disrupted-d-revised.pdf", width = 6, height = 8)
 
+ 
+ # now that we must have numbers and I am redoing all of these: 
+ 
+ # same as above but with "disrupted" (hence getdispanel) 
+ getdispanel = function(x) {
+   return(ggplot(data =filter(elem, world=="d" ,panel==x), 
+                 aes(x = students_disrupted, fill=index_asymp)) +
+            scale_fill_manual(values = mycols[c(3,1)]) + 
+            geom_histogram(position="dodge",breaks=0:26,alpha=0.8)  + # coord_flip() + 
+            facet_grid(interv~ index_asymp) + guides(fill=FALSE) +  theme_light()+
+            ggtitle(elem$panelnew[min(which(elem$panel==x))])) # +
+   # theme(strip.text = element_text(size = 8)))
+ }
+ plist = lapply(1:4, getdispanel)
+ ggarrange(plist[[1]]+theme(axis.title.x = element_blank(),
+                            strip.text.y = element_blank()),
+           plist[[2]]+theme(axis.title.x = element_blank())+
+             theme(axis.title.y = element_blank())  ,
+           plist[[3]]+xlab("Students disrupted") +
+             theme(strip.text.y = element_blank()), 
+           plist[[4]]+theme(axis.title.y= element_blank())+xlab("Students disrupted"),
+           nrow = 2, ncol=2)
+ ggsave("figure4-revised-again.pdf", width = 6, height=8)
+ 
+ 
 
 ############################################################
 # Figure 5 :  information about the "force of infection" from the cluster 
@@ -174,19 +263,20 @@ plotlist[[4]]
 elem_long  = gather(elem, laxorstrict, days_exp, days_asymp_lax, days_asymp_strict)
 elem_long$laxorstrict = factor(elem_long$laxorstrict)
 
-ggplot(data=filter(filter(elem_long, days_exp >=0), world=="d"), aes(y= days_exp, x=interv, fill=laxorstrict,
-                                                                     color=laxorstrict))+
+ggplot(data=filter(filter(elem_long, days_exp >=0), world=="d"),
+       aes(y= days_exp, x=interv, fill=laxorstrict,color=laxorstrict))+
   geom_violin(width = 0.9, alpha=0.5,position = position_dodge(width = 0.5)) + #  geom_jitter(alpha=0.2, width = 0.1, size = 0.3)+
   facet_grid( panelnew ~ index_asymp )   + theme_light() +
 #  scale_fill_manual(values = mycols[c(3,1)]) + 
 #  scale_color_manual(values = mycols[c(3,1)]) + 
-  theme(strip.text = element_text(face="bold", size=8,color="black"),
-        strip.background = element_rect(fill="grey65",colour="white",size=0.7),
-        strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
+  theme(#strip.text = element_text(face="bold", size=8,color="black"),
+       # strip.background = element_rect(fill="grey65",colour="white",size=0.7),
+        #strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
         axis.title.x = element_blank(), legend.position = "bottom")  +
+  ylab("Days exposure") +
   scale_fill_discrete(name="Lax or strict", labels = c("Lax", "Strict"))+ guides( color=FALSE) 
 
-ggsave("figure5-revised.pdf", width=6, height=8)
+ggsave("figure5-revised-again.pdf", width=6, height=8)
 
 
 
@@ -199,8 +289,8 @@ ggsave("figure5-revised.pdf", width=6, height=8)
 # ---- read data ---- 
 highmorn = readr::read_csv("highschool_morning.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "Index symptomatic", "Index asymptomatic")) %>% 
   mutate(interv =  ifelse(protocol == "I", "Baseline",
-                          ifelse(protocol == "II", "Contact\n" ,  
-                                 ifelse(protocol == "III", "Two groups\nis an outbreak" ,  
+                          ifelse(protocol == "II", "Contact" ,  
+                                 ifelse(protocol == "III", "Two groups" ,  
                                         ifelse(protocol == "IV", "Whole class",NA ))))) %>% 
   mutate( panelnew = ifelse(panelname =="env beta low, index same", "Index and class low",
                             ifelse(panelname ==  "env beta low, index higher", "Index medium, class low",
@@ -214,8 +304,8 @@ highmorn = readr::read_csv("highschool_morning.csv") %>% mutate(index_asymp = if
   
   highaft = readr::read_csv("highschool_afternoon.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "Index symptomatic", "Index asymptomatic")) %>% 
     mutate(interv =  ifelse(protocol == "I", "Baseline",
-                            ifelse(protocol == "II", "Contact\n" ,  
-                                   ifelse(protocol == "III", "Two groups\nis an outbreak" ,  
+                            ifelse(protocol == "II", "Contact" ,  
+                                   ifelse(protocol == "III", "Two groups" ,  
                                           ifelse(protocol == "IV", "Whole class",NA ))))) %>% 
     mutate( panelnew = ifelse(panelname =="env beta low, index same", "Index and class low",
                               ifelse(panelname ==  "env beta low, index higher", "Index medium, class low",
@@ -229,7 +319,7 @@ highmorn = readr::read_csv("highschool_morning.csv") %>% mutate(index_asymp = if
 highnorm = readr::read_csv("highschool_normal.csv") %>% mutate(index_asymp = ifelse(index_asymp==0, "Index symptomatic", "Index asymptomatic")) %>% 
   mutate(interv =  ifelse(protocol == "I", "Baseline",
                           ifelse(protocol == "II", "Contact\n" ,  
-                                 ifelse(protocol == "III", "Two groups\nis an outbreak" ,  
+                                 ifelse(protocol == "III", "Two groups" ,  
                                         ifelse(protocol == "IV", "Whole class",NA ))))) %>% 
   mutate( panelnew = ifelse(panelname =="env beta low, index same", "Index and class low",
                             ifelse(panelname ==  "env beta low, index higher", "Index medium, class low",
@@ -359,18 +449,18 @@ highall = highall %>% mutate( panelnew = ifelse(panelname =="env beta low, index
                                                 "Index and class medium",
                                                 "Index high, class medium")))
 
-
+highall$interv[which(highall$interv == "Contact\n")] = "Contact"
 ggplot(data=filter(highall,world=="d"), aes(x=interv, y=total_infected,fill=Setting) )+
   facet_wrap ( ~ panelnew,nrow=4 )   + theme_light() + 
   geom_boxplot(width = 0.35, alpha=0.5) +
   theme(axis.title.x = element_blank()) + 
-  theme(strip.text = element_text(face="bold", size=8,color="black"),
-        strip.background = element_rect(fill="grey65",colour="white",size=0.7),
-        strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
+  theme(#strip.text = element_text(face="bold", size=8,color="black"),
+        #strip.background = element_rect(fill="grey65",colour="white",size=0.7),
+        #strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
 #        axis.title.y = element_text(), 
         axis.text.x = element_text(size = 7), legend.position = "bottom") +ylab("Total cluster size")
 # better . 
-# ggsave(file = "high-compare-boxplot.pdf", width = 5, height = 8)
+ ggsave(file = "high-compare-boxplot-again.pdf", width = 5, height = 8)
 
 
 
@@ -396,7 +486,7 @@ ggplot(data=filter(highboth, world=="d"), aes(x= total_not_detected, y=interv, f
         axis.title.y = element_blank(), legend.position = "bottom")  +
   xlab("Cluster size") + guides(fill=FALSE, color=FALSE)
 
-# new - recreate Figure A2 in the paper 
+# new - recreate Figure A2 (now A3 i think)  in the paper 
 ggplot(data=filter(highall, world=="d" & Setting == "Modified"), aes(x= total_not_detected, y=interv, fill=index_asymp,
                                               color=index_asymp))+
   stat_binline(breaks=0:46, scale = 0.9, 
@@ -411,6 +501,33 @@ ggplot(data=filter(highall, world=="d" & Setting == "Modified"), aes(x= total_no
         legend.position = "bottom")  +
   xlab("Cluster size") +ylab("Count")+ guides(fill=FALSE, color=FALSE)
 ggsave("high-world-d-revised.pdf",width=6,height = 8)
+
+# revising again 
+gethighpanel = function(x) {
+  return(ggplot(data =filter(highall, world=="d" ,panel==x, Setting == "Modified"), 
+                aes(x = total_not_detected, fill=index_asymp)) +
+           scale_fill_manual(values = mycols[c(3,1)]) + 
+           geom_histogram(position="dodge",breaks=0:12,alpha=0.8)  + # coord_flip() + 
+           facet_grid(interv~ index_asymp) + guides(fill=FALSE) +  theme_light()+
+           ggtitle(highall$panelnew[min(which(highall$panel==x))])) # +
+  # theme(strip.text = element_text(size = 8)))
+}
+
+plist = lapply(1:4, gethighpanel)
+ggarrange(plist[[1]]+theme(axis.title.x = element_blank(),
+                           strip.text.y = element_blank()),
+          plist[[2]]+theme(axis.title.x = element_blank())+
+            theme(axis.title.y = element_blank())  ,
+          plist[[3]]+xlab("Total cluster size") +
+            theme(strip.text.y = element_blank()), 
+          plist[[4]]+theme(axis.title.y= element_blank())+xlab("Total cluster size"),
+          nrow = 2, ncol=2)
+ggsave("high-world-d-revised-again.pdf", width = 6, height=8)
+
+
+
+
+
 
 
 # and here is Figure A3 in the paper 
@@ -428,6 +545,32 @@ ggplot(data=filter(highall, world=="d", Setting =="Modified"), aes(x= students_d
          legend.position = "bottom")  +
   xlab("Students disrupted") +ylab("Count")+ guides(fill=FALSE, color=FALSE)
 ggsave("high-tot-disrupted-d-revised.pdf", width = 6, height = 8)
+
+
+
+# same as above but with "disrupted" (hence getdispanel) 
+getdishighpanel = function(x) {
+  return(ggplot(data =filter(highall, world=="d",Setting =="Modified",panel==x), 
+                aes(x = students_disrupted, fill=index_asymp)) +
+           scale_fill_manual(values = mycols[c(3,1)]) + 
+           geom_histogram(position="dodge",breaks=0:46,alpha=0.8)  + # coord_flip() + 
+           facet_grid(interv~ index_asymp) + guides(fill=FALSE) +  theme_light()+
+           ggtitle(highall$panelnew[min(which(highall$panel==x))])) # +
+  # theme(strip.text = element_text(size = 8)))
+}
+plist = lapply(1:4, getdishighpanel)
+ggarrange(plist[[1]]+theme(axis.title.x = element_blank(),
+                           strip.text.y = element_blank()),
+          plist[[2]]+theme(axis.title.x = element_blank())+
+            theme(axis.title.y = element_blank())  ,
+          plist[[3]]+xlab("Students disrupted") +
+            theme(strip.text.y = element_blank()), 
+          plist[[4]]+theme(axis.title.y= element_blank())+xlab("Students disrupted"),
+          nrow = 2, ncol=2)
+ggsave("high-tot-disrupted-d-revised-again.pdf", width = 6, height=8)
+
+
+
 
 ##################################################
 
@@ -456,14 +599,14 @@ ggplot(data=filter(filter(high_long, days_exp >=0), world=="d", Setting=="Modifi
   facet_grid( panelnew ~ index_asymp )   + theme_light() +
   #  scale_fill_manual(values = mycols[c(3,1)]) + 
   #  scale_color_manual(values = mycols[c(3,1)]) + 
-  theme(strip.text = element_text(face="bold", size=8,color="black"),
-        strip.background = element_rect(fill="grey65",colour="white",size=0.7),
-        strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
+  theme(#strip.text = element_text(face="bold", size=8,color="black"),
+        #strip.background = element_rect(fill="grey65",colour="white",size=0.7),
+        #strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")),
         axis.title.x = element_blank(), legend.position = "bottom")  +
   scale_fill_discrete(name="Lax or strict", labels = c("Lax", "Strict"))+
   ylab("Student-days")+guides( color=FALSE) 
 
-ggsave("high-force-infection-revised.pdf", width=6, height=8)
+ggsave("high-force-infection-revised-again.pdf", width=6, height=8)
 
 
 
@@ -482,7 +625,7 @@ ggsave("high-force-infection-revised.pdf", width=6, height=8)
 
 
 ###############################################################
-# Begin random regular testing 
+# Begin random regular testing (figure 6) 
 ###############################################################
 
 
@@ -514,6 +657,17 @@ ggplot(data=elempool, aes(x= total_infected, y=freqdesc, fill=`Tests performed o
   xlab("Total cluster size")+ylab("Count") + guides( color=FALSE)
 
 ggsave("pooled-testing-revised.pdf", width = 8, height = 6)
+
+
+ggplot(data=elempool, aes(x=total_infected, fill=`Tests performed on site`)) +
+         geom_histogram(breaks=0:26,position="identity",alpha=0.6)+
+         facet_grid(freqdesc ~ index_asymp) +theme_light() +
+         scale_fill_manual(values = mycols[c(3,1)]) +
+  xlab("Total cluster size")+ylab("Count")+theme(legend.position = "bottom")
+         
+ggsave("pooled-testing-revised-again.pdf", width = 6, height =8)
+
+
 
 
 
